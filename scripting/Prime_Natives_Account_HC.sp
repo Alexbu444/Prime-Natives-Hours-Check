@@ -27,6 +27,8 @@ public void OnPluginStart()
 	g_ConVar.GetString(g_szApiKey, sizeof(g_szApiKey));
 
 	AutoExecConfig(true, "account_hc", "sourcemod/prime_natives");
+	
+	httpClient = new HTTPClient("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001");	
 }
 
 public Action PN_OnPlayerStatusChange(int iClient, PRIME_STATUS &iNewStatus, STATUS_CHANGE_REASON iReason)
@@ -34,8 +36,6 @@ public Action PN_OnPlayerStatusChange(int iClient, PRIME_STATUS &iNewStatus, STA
 	if(iReason == PLAYER_LOAD && iNewStatus != PRIME)
 	{
 		iNewStatus = VERIFICATION;
-		
-		httpClient = new HTTPClient("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001");	
 		
 		char szApiUrlP[256];
 		char szAuthId[20];
@@ -91,7 +91,7 @@ public void OnRequestComplete(HTTPResponse response, any value)
 	CloseHandle(hResponseRoot);
 }
 
-public void OnClientDissconect(int iClient)
+public void OnClientDisconnect(int iClient)
 {
 	g_bAccess[iClient] = false;
 }
