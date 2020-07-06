@@ -6,13 +6,12 @@ public Plugin myinfo =
 {
 	name		= "[Prime Natives] Hours Check",
 	author		= "Alexbu444",
-	description = "Checks players account game hours",
-	version		= "1.0.0.1",
-	url			= "https://t.me/alexbu444"
+	description	= "Checks players account game hours",
+	version		= "1.0.0.2",
+	url		= "https://t.me/alexbu444"
 };
 
 HTTPClient httpClient;
-ConVar g_ConVar;
 
 char g_szApiKey[34];
 int g_iHours;
@@ -20,11 +19,13 @@ bool g_bAccess[MAXPLAYERS+1];
 
 public void OnPluginStart()
 {
-	g_ConVar = CreateConVar("sm_prime_natives_account_hc_minimum_hours", "20", "Minimum account game hours", _, true, 1.0);
-	g_iHours = g_ConVar.IntValue;
+	ConVar ConVar;
+	
+	ConVar = CreateConVar("sm_prime_natives_account_hc_minimum_hours", "20", "Minimum account game hours", _, true, 1.0);
+	g_iHours = ConVar.IntValue;
 
-	g_ConVar = CreateConVar("sm_prime_natives_account_hc_api_key", "", "Steam Web API Key");
-	g_ConVar.GetString(g_szApiKey, sizeof(g_szApiKey));
+	ConVar = CreateConVar("sm_prime_natives_account_hc_api_key", "", "Steam Web API Key");
+	ConVar.GetString(g_szApiKey, sizeof(g_szApiKey));
 
 	AutoExecConfig(true, "account_hc", "sourcemod/prime_natives");
 	
@@ -70,10 +71,8 @@ public void OnRequestComplete(HTTPResponse response, any value)
 	}
 	
 	JSONObject hGame = view_as<JSONObject>(hResponseGames.Get(0));
-
-	int iPlaytime = hGame.GetInt("playtime_forever");
 	
-	if(g_iHours > (iPlaytime / 60))
+	if(g_iHours > (hGame.GetInt("playtime_forever") / 60))
 	{
 		PN_SetPlayerStatus(value, WHITE_LIST, WHITE_LIST_ADD);
 		g_bAccess[value] = true;
